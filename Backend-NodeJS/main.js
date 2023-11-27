@@ -39,8 +39,12 @@ app.get('/getPrescInfo', (req, res) => { //end
     const {uid} = req.query;
     connection.query(`SELECT uid,prescId FROM users WHERE uid=${uid}`, function(error, results, fields){
         if (error) { console.log(error); }
-        console.log(results);
-        res.status(200).send(results);
+        const newData = results.map(item => {
+            const prescIds = item.prescId.split(',').map(id => parseInt(id));
+            return { uid: item.uid, prescId: prescIds };
+        });
+        console.log(newData);
+        res.status(200).send(newData);
     });
 });
 
@@ -120,7 +124,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.post('/newPresc', upload.single('image'), async (req, res) => {
-    const { uid, medList } = req.body;
+    const { uid, medList, duration } = req.body;
     console.log(`uid:${uid}, list:${medList}`);
 
     try {
@@ -172,8 +176,12 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
                 }
             });
         });
+        
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+
         const results3 = await new Promise((resolve, reject) => {
-            connection.query(`INSERT INTO medicine VALUES(${id}, "${medList}")`, function(error, results, fields){
+            connection.query(`INSERT INTO medicine VALUES(${id},"${formattedDate}",${duration} ,"${medList}")`, function(error, results, fields){
                 if (error) {
                     reject(error);
                 } else {
