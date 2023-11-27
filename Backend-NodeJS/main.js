@@ -20,20 +20,31 @@ var connection = mysql. createConnection({  //커넥션변수에 mysql변수에 
 
 connection.connect();
 
-app.get('/', (req, res) => {
-    res.send(`alive`)
+app.get('/ping', (req, res) => { //end
+    res.writeHead(204);
+    res.write(``)
+    res.end()
 });
 
-app.get('/getList', (req, res) => { //end
+app.get('/getUserInfo', (req, res) => { //end
     const {uid} = req.query;
-    connection.query(`SELECT * FROM users WHERE uid=${uid}`, function(error, results, fields){
+    connection.query(`SELECT uid,name,allergic FROM users WHERE uid=${uid}`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
-        res.send(results);
+        res.status(200).send(results);
     });
 });
 
-app.get('/getMedPic', (req, res) => { //end
+app.get('/getPrescInfo', (req, res) => { //end
+    const {uid} = req.query;
+    connection.query(`SELECT uid,prescId FROM users WHERE uid=${uid}`, function(error, results, fields){
+        if (error) { console.log(error); }
+        console.log(results);
+        res.status(200).send(results);
+    });
+});
+
+app.get('/getPrescPic', (req, res) => { //end
     const {id} = req.query;
     var fs = require('fs');
     const file = fs.readFileSync(`../image/${id}.jpg`)
@@ -47,18 +58,54 @@ app.get('/getMedList', (req, res) => { //end
     connection.query(`SELECT * FROM medicine WHERE id=${id}`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
-        res.send(results);
+        res.status(200).send(results);
     });
 });
 
-
 app.get('/newUser', (req, res) => { //end
-    const { uid, allergic } = req.query;
-    connection.query(`INSERT INTO users VALUES(${uid}, NULL ,${allergic})`, function(error, results, fields){
+    const { uid, name, allergic } = req.query;
+    connection.query(`INSERT INTO users VALUES(${uid}, ${name}, "",${allergic})`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
-        res.send("ok");
+        res.writeHead(204);
+        res.write(``)
+        res.end()
     });
+});
+
+app.delete('/delPresc', (req, res) => {
+    const {uid} = req.query;
+    const {id} = req.query;
+
+    const fs = require('fs');
+    fs.unlink(`/mymedicine/image/${id}.jpg`, err => {});
+
+    connection.query(`DELETE from medicine where id=${id}`, function(error, results, fields){
+        if (error) { console.log(error); }
+        console.log(results);
+    });
+    connection.query(`select prescId from users where uid=${uid}`, function(error, results, fields){
+        let prescId;
+        for (let i = 0; i < results.length; i++) {
+            for (let keyNm in results[i]) {
+                if (keyNm === "prescId") {
+                    prescId = results[i][keyNm];
+                }
+            }
+        }
+        let arr = prescId.split(",");
+        let newArr = arr.filter(item => item !== `${id}`);
+        let newprescId = newArr.join(",");
+        console.log(newprescId);
+
+        connection.query(`UPDATE users SET prescId="${newprescId}" WHERE uid=${uid};`, function(error, results, fields){
+            console.log(results);
+        });
+    });
+    
+    res.writeHead(204)
+    res.write(``)
+    res.end()
 });
 
 const storage = multer.diskStorage({
@@ -72,7 +119,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/enroll', upload.single('image'), async (req, res) => {
+app.post('/newPresc', upload.single('image'), async (req, res) => {
     const { uid, medList } = req.body;
     console.log(`uid:${uid}, list:${medList}`);
 
@@ -87,31 +134,37 @@ app.post('/enroll', upload.single('image'), async (req, res) => {
             });
         });
 
-        let regid;
+        let prescId;
         for (let i = 0; i < results.length; i++) {
             for (let keyNm in results[i]) {
-                if (keyNm === "regid") {
-                    regid = results[i][keyNm];
+                if (keyNm === "prescId") {
+                    prescId = results[i][keyNm];
                 }
             }
         }
-        console.log(regid);
+        console.log(prescId);
         let count
-        if(regid!=null) { count = regid.split(',').length; }
+        if(prescId!="") { 
+            let prescIdLength = prescId.split(',').length; 
+            var arr = prescId.split(',');
+            let last = arr[prescIdLength-1].charAt(3);
+            console.log(`last id : ${last}`);
+            count = parseInt(last);
+        }
         else count = 0;
         console.log(count);
         const id = parseInt(uid) + count + 1;
 
-        if(regid!=null) {
-            regid += ',';
-            regid += String(id);
+        if(prescId!="") {
+            prescId += ',';
+            prescId += String(id);
         }
-        else regid = String(id);
+        else prescId = String(id);
 
-        console.log(regid);
+        console.log(prescId);
         
         const results2 = await new Promise((resolve, reject) => {
-            connection.query(`UPDATE users SET regid="${regid}" WHERE uid=${uid}`, function(error, results, fields){
+            connection.query(`UPDATE users SET prescId="${prescId}" WHERE uid=${uid}`, function(error, results, fields){
                 if (error) {
                     reject(error);
                 } else {
@@ -128,8 +181,7 @@ app.post('/enroll', upload.single('image'), async (req, res) => {
                 }
             });
         });
-        
-        res.status(200).send(String(id));
+        res.status(200).send(`[{"res":` + String(id) + `}]`);
 
         const newFileName = `${id}.jpg`; // 새 파일 이름 설정
 
@@ -138,10 +190,9 @@ app.post('/enroll', upload.single('image'), async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error');
+        res.status(500).send(``);
     }
 });
-
 
 server.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
