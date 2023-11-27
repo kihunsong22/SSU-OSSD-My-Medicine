@@ -28,10 +28,19 @@ app.get('/ping', (req, res) => { //end
 
 app.get('/getUserInfo', (req, res) => { //end
     const {uid} = req.query;
-    connection.query(`SELECT * FROM users WHERE uid=${uid}`, function(error, results, fields){
+    connection.query(`SELECT uid,name,allergic FROM users WHERE uid=${uid}`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
-        res.send(results);
+        res.status(200).send(results);
+    });
+});
+
+app.get('/getPrescInfo', (req, res) => { //end
+    const {uid} = req.query;
+    connection.query(`SELECT uid,prescId FROM users WHERE uid=${uid}`, function(error, results, fields){
+        if (error) { console.log(error); }
+        console.log(results);
+        res.status(200).send(results);
     });
 });
 
@@ -49,15 +58,13 @@ app.get('/getMedList', (req, res) => { //end
     connection.query(`SELECT * FROM medicine WHERE id=${id}`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
-        res.writeHead(200);
-        res.write(results)
-        res.end()
+        res.status(200).send(results);
     });
 });
 
 app.get('/newUser', (req, res) => { //end
-    const { uid, allergic } = req.query;
-    connection.query(`INSERT INTO users VALUES(${uid}, NULL ,${allergic})`, function(error, results, fields){
+    const { uid, name, allergic } = req.query;
+    connection.query(`INSERT INTO users VALUES(${uid}, ${name}, "",${allergic})`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
         res.writeHead(204);
@@ -72,7 +79,7 @@ app.delete('/delPresc', (req, res) => {
 
     const fs = require('fs');
     fs.unlink(`/mymedicine/image/${id}.jpg`, err => {});
-    
+
     connection.query(`DELETE from medicine where id=${id}`, function(error, results, fields){
         if (error) { console.log(error); }
         console.log(results);
@@ -137,7 +144,7 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         }
         console.log(prescId);
         let count
-        if(prescId!=null) { 
+        if(prescId!="") { 
             let prescIdLength = prescId.split(',').length; 
             var arr = prescId.split(',');
             let last = arr[prescIdLength-1].charAt(3);
@@ -148,7 +155,7 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         console.log(count);
         const id = parseInt(uid) + count + 1;
 
-        if(prescId!=null) {
+        if(prescId!="") {
             prescId += ',';
             prescId += String(id);
         }
