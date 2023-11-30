@@ -16,14 +16,14 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   // final username, password;
-  final uid = "2000";
+  static const uid = 2000;
 
   final ApiService apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
     late Future<int> serverStatus = apiService.pingServer();
-    late Future<UserModel> userData = apiService.getUserInfo(uid);
+    // late Future<UserModel> userData = apiService.getUserInfo(uid);
     late Future<PrescListModel> prescList = apiService.getPrescList(uid);
 
     return Scaffold(
@@ -42,8 +42,11 @@ class _ListScreenState extends State<ListScreen> {
             width: 1,
           ),
           Expanded(
-            child: FutureBuilder(
-              future: serverStatus,
+            child: FutureBuilder<List<dynamic>>(
+              future: Future.wait([
+                apiService.pingServer(),
+                apiService.getPrescList(uid),
+              ]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -54,41 +57,33 @@ class _ListScreenState extends State<ListScreen> {
                     child: Text('Error: ${snapshot.error}'),
                   );
                 } else {
-                  if (snapshot.data != 204) {
-                    return const Center(
-                      child: Text('Server status error'),
-                    );
+                  if (snapshot.data != null) {
+                    if (snapshot.data![0] != 204) {
+                      return const Center(
+                        child: Text('Server status error'),
+                      );
+                    } else {
+                      return ListView.builder(
+                        itemCount: snapshot.data![1].length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              bottom: 20,
+                            ),
+                            child: PrescWidget(
+                              uid: uid,
+                              prescId: snapshot.data![1].prescId[
+                                  snapshot.data![1].length - index - 1],
+                            ),
+                          );
+                        },
+                      );
+                    }
                   } else {
-                    // return const Placeholder();
-                    return FutureBuilder(
-                      future: prescList,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        } else {
-                          return ListView.builder(
-                            itemCount: snapshot.data?.length ?? 0,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  right: 20,
-                                  bottom: 20,
-                                ),
-                                child: PrescWidget(
-                                    data: snapshot.data?.prescId[index] ?? -1),
-                              );
-                            },
-                          );
-                        }
-                      },
+                    return const Center(
+                      child: Text('No data'),
                     );
                   }
                 }

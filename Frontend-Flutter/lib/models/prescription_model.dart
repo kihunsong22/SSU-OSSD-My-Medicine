@@ -22,11 +22,20 @@ class PrescModel {
     return regDate;
   }
 
+  bool get isExpired {
+    final now = DateTime.now();
+    final regDate = DateTime.parse(this.regDate);
+    final diff = now.difference(regDate).inDays;
+    return diff > prescPeriodDays;
+  }
+
+  int get medicineListLength => medicineList.length;
+
   PrescModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         regDate = json['regDate'],
         prescPeriodDays = json['duration'],
-        medicineList = json['medicine'];
+        medicineList = json['medicine'].toString().split(',').reversed.toList();
 
   void printPrescInfoOneline() {
     log("id: $id, date: $regDate, prescPeriodDays: $prescPeriodDays, medicineList: $medicineList");
