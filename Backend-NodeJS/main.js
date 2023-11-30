@@ -35,16 +35,19 @@ app.get('/getUserInfo', (req, res) => { //end
     });
 });
 
-app.get('/getPrescInfo', (req, res) => { //end
+app.get('/getPrescList', (req, res) => {
     const {uid} = req.query;
-    connection.query(`SELECT uid,prescId FROM users WHERE uid=${uid}`, function(error, results, fields){
+    connection.query(`SELECT prescId FROM users WHERE uid=${uid}`, function(error, results, fields){
         if (error) { console.log(error); }
-        const newData = results.map(item => {
-            const prescIds = item.prescId.split(',').map(id => parseInt(id));
-            return { uid: item.uid, prescId: prescIds };
-        });
-        console.log(newData);
-        res.status(200).send(newData);
+        if (results.length > 0) {
+            const prescIds = results[0].prescId.split(',').map(id => parseInt(id));
+            const newData = { prescId: prescIds };
+            console.log(newData);
+            res.status(200).send(newData);
+        } else {
+            console.log('No data found');
+            res.status(404).send({ message: 'No data found' });
+        }
     });
 });
 
@@ -57,7 +60,7 @@ app.get('/getPrescPic', (req, res) => { //end
     res.end()
 });
 
-app.get('/getMedList', (req, res) => { //end
+app.get('/getPrescInfo', (req, res) => { //end
     const {id} = req.query;
     connection.query(`SELECT * FROM medicine WHERE id=${id}`, function(error, results, fields){
         if (error) { console.log(error); }
