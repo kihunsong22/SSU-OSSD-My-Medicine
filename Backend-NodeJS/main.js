@@ -9,6 +9,13 @@ const PORT = 5000
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
 
+require('dotenv').config();
+const { OpenAI } = require('openai');
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const openai = new OpenAI({
+  apiKey: OPENAI_API_KEY
+});
 
 var mysql = require('mysql');
 var connection = mysql. createConnection({
@@ -93,6 +100,32 @@ app.get('/getPrescInfo', (req, res) => { //end
         if (error) { console.log(error); }
         console.log(results);
         res.status(200).send(results);
+    });
+});
+
+app.get('/presc', (req, res) => { //end
+    const {prescId} = req.query;
+    connection.query(`SELECT medicine FROM prescriptions WHERE prescId=${prescId}`, function(error, results, fields){
+        if (error) { console.log(error); }
+        console.log(results[0].medicine);
+
+        async function main() {
+            const completion = await openai.chat.completions.create({
+              messages: [{"role": "system", "content": "너는 약 복용 주의사항을 알려주는 비서야. 약 리스트를 넘겨주면, 해당 약별로 복용 주의사항을 응답해줘. 앞에 '알겠습니다.'는 붙이지 마. 형식은 약명:\n-주의사항 1\n-주의사항2.. 이렇게 해줘."},
+                  {"role": "user", "content": `"${results[0].medicine}"`}],
+              model: "gpt-3.5-turbo",
+            });
+            generatedInstruction = completion.choices[0].message.content;
+            console.log(generatedInstruction);
+          
+            connection.query(`UPDATE prescriptions SET generatedInstruction="${generatedInstruction}" WHERE prescId=${prescId}`, function(error, results, fields){
+                if (error) { console.log(error); }
+                console.log(results);
+            });
+        }
+        main();
+
+        res.status(200).send(results[0].medicine);
     });
 });
 
@@ -191,9 +224,9 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
 
         if(prescIdList!="") {
             prescIdList += ',';
-            prescIdList += String(id);
+            prescIdList += String(prescId);
         }
-        else prescIdList = String(id);
+        else prescIdList = String(prescId);
 
         console.log(prescIdList);
         
@@ -211,7 +244,7 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
         const results3 = await new Promise((resolve, reject) => {
-            connection.query(`INSERT INTO prescriptions VALUES(${prescId},"${formattedDate}",${duration} ,"${medList}")`, function(error, results, fields){
+            connection.query(`INSERT INTO prescriptions VALUES(${prescId},"${formattedDate}",${duration} ,"${medList}", "")`, function(error, results, fields){
                 if (error) {
                     reject(error);
                 } else {
@@ -226,6 +259,21 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         var fs = require('fs');
         fs.rename(req.file.path, path.join("/mymedicine/image", newFileName), async (err) => {
         });
+        async function main() {
+            const completion = await openai.chat.completions.create({
+              messages: [{"role": "system", "content": "너는 약 복용 주의사항을 알려주는 비서야. 약 리스트를 넘겨주면, 해당 약별로 복용 주의사항을 응답해줘. 앞에 '알겠습니다.'는 붙이지 마. 형식은 약명:\n-주의사항 1\n-주의사항2.. 이렇게 해줘."},
+                  {"role": "user", "content": `"${medList}"`}],
+              model: "gpt-3.5-turbo",
+            });
+            generatedInstruction = completion.choices[0].message.content;
+            console.log(generatedInstruction);
+    
+            connection.query(`UPDATE prescriptions SET generatedInstruction="${generatedInstruction}" WHERE prescId=${prescId}`, function(error, results, fields){
+                if (error) { console.log(error); }
+                console.log(results);
+            });
+        }
+        main();
     } catch (error) {
         console.error(error);
         res.status(500).send(``);
