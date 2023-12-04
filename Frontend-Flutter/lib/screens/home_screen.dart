@@ -63,16 +63,16 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
       inactiveColorPrimary: Colors.grey,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.search),
-      title: ("Search"),
-      activeColorPrimary: Colors.deepPurple[200]!,
-      inactiveColorPrimary: Colors.grey,
-    ),
-    PersistentBottomNavBarItem(
       icon: const Icon(Icons.add),
       title: ("Add"),
       // activeColorPrimary: Colors.deepPurple[200]!,
       activeColorPrimary: Colors.white,
+      inactiveColorPrimary: Colors.grey,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.search),
+      title: ("Search"),
+      activeColorPrimary: Colors.deepPurple[200]!,
       inactiveColorPrimary: Colors.grey,
     ),
   ];

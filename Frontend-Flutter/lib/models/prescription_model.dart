@@ -1,14 +1,14 @@
 import 'dart:developer';
 
 class PrescModel {
-  final int id;
+  final int prescId;
   // DateTime date;
   final String regDate;
   final int prescPeriodDays;
   final List<String> medicineList;
 
   PrescModel({
-    required this.id,
+    required this.prescId,
     required this.regDate,
     required this.prescPeriodDays,
     required this.medicineList,
@@ -24,7 +24,8 @@ class PrescModel {
 
   bool get isExpired {
     final now = DateTime.now();
-    final regDate = DateTime.parse(this.regDate);
+    final regDate =
+        DateTime.parse(this.regDate); // todo: "2023-12.4" -> "2023-12-04"
     final diff = now.difference(regDate).inDays;
     return diff > prescPeriodDays;
   }
@@ -32,12 +33,12 @@ class PrescModel {
   int get medicineListLength => medicineList.length;
 
   PrescModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : prescId = json['prescId'],
         regDate = json['regDate'],
         prescPeriodDays = json['duration'],
         medicineList = json['medicine'].toString().split(',').reversed.toList();
 
   void printPrescInfoOneline() {
-    log("id: $id, date: $regDate, prescPeriodDays: $prescPeriodDays, medicineList: $medicineList");
+    log("prescId: $prescId, date: $regDate, prescPeriodDays: $prescPeriodDays, medicineList: $medicineList");
   }
 }

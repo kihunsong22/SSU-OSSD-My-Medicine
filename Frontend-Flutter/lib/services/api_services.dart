@@ -52,7 +52,7 @@ class ApiService {
 
 // get detailed information of a prescription
   Future<PrescModel> getPrescInfo(int prescId) async {
-    final url = Uri.http(baseUrl, '/getPrescInfo', {'id': '$prescId'});
+    final url = Uri.http(baseUrl, '/getPrescInfo', {'prescId': '$prescId'});
     final response = await http.get(url);
     log("/getPrescInfo: <${response.statusCode}>, <${response.body}>");
     if (response.statusCode == 200) {
@@ -66,7 +66,7 @@ class ApiService {
   }
 
   Future<Uint8List> getPrescPic(int prescId) async {
-    final url = Uri.http(baseUrl, '/getPrescPic', {'id': '$prescId'});
+    final url = Uri.http(baseUrl, '/getPrescPic', {'prescId': '$prescId'});
     final response = await http.get(url);
     // log("/getPrescPic: <${response.statusCode}>, <${response.body}>");
     log("/getPrescPic: <${response.statusCode}>, ${response.body.length}B");
@@ -79,12 +79,12 @@ class ApiService {
     throw Error();
   }
 
-  String getPrescPicLink(int prescId) {
-    String url = "http://141.164.62.81:5000/getPrescPic?id=$prescId";
-    log("getPrescPicLink: $url");
+  // String getPrescPicLink(int prescId) {
+  //   String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
+  //   log("getPrescPicLink: $url");
 
-    return url;
-  }
+  //   return url;
+  // }
 
   // Future<String> getPrescPicLink(int prescId) async {
   //   final url = Uri.http(baseUrl, '/getPrescPicLink', {'id': '$prescId'});

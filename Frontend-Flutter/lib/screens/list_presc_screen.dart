@@ -75,7 +75,7 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
                             ),
                             child: PrescWidget(
                               uid: uid,
-                              prescId: snapshot.data![1].prescId[
+                              prescId: snapshot.data![1].prescIdList[
                                   snapshot.data![1].length - index - 1],
                             ),
                           );

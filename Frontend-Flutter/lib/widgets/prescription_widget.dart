@@ -78,7 +78,7 @@ class _BuildPrescWidget extends StatelessWidget {
   });
 
   String _getPrescPicLink(int prescId) {
-    String url = "http://141.164.62.81:5000/getPrescPic?id=$prescId";
+    String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
     log("getPrescPicLink: $url");
 
     return url;
@@ -105,7 +105,7 @@ class _BuildPrescWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('처방전번호: ${prescModel.id.toString()}'),
+              Text('처방전번호: ${prescModel.prescId.toString()}'),
               Text(prescModel.regDate),
             ],
           ),
