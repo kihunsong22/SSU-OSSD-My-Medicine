@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:medicineapp/screens/home_screen.dart';
+import 'package:medicineapp/screens/login_screen.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const HomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }

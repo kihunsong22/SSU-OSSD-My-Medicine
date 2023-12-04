@@ -91,8 +91,13 @@ class _BuildPrescWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: (BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        // color: Colors.red[50],
-
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            // offset: Offset(0, 2),
+            blurRadius: 6,
+          ),
+        ],
         color: prescModel.isExpired ? Colors.grey[350] : Colors.white,
       )),
       child: Column(

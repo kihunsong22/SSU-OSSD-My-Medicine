@@ -7,14 +7,14 @@ import 'package:medicineapp/screens/ui_consts.dart';
 import 'package:medicineapp/services/api_services.dart';
 import 'package:medicineapp/widgets/prescription_widget.dart';
 
-class ListScreen extends StatefulWidget {
-  const ListScreen({super.key});
+class ListPrescScreen extends StatefulWidget {
+  const ListPrescScreen({super.key});
 
   @override
-  State<ListScreen> createState() => _ListScreenState();
+  State<ListPrescScreen> createState() => _ListPrescScreenState();
 }
 
-class _ListScreenState extends State<ListScreen> {
+class _ListPrescScreenState extends State<ListPrescScreen> {
   // final username, password;
   static const uid = 2000;
 
@@ -22,14 +22,15 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    late Future<int> serverStatus = apiService.pingServer();
+    // late Future<int> serverStatus = apiService.pingServer();
     // late Future<UserModel> userData = apiService.getUserInfo(uid);
-    late Future<PrescListModel> prescList = apiService.getPrescList(uid);
+    // late Future<PrescListModel> prescList = apiService.getPrescList(uid);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      // backgroundColor: Colors.grey[100],
+      backgroundColor: const Color(0xfff2f2fe),
       appBar: AppBar(
-        title: ListScreenAppBarWidget(onRefresh: () {
+        title: ListPrescScreenAppBarWidget(onRefresh: () {
           setState(() {});
         }),
         centerTitle: true,
@@ -96,10 +97,10 @@ class _ListScreenState extends State<ListScreen> {
   }
 }
 
-class ListScreenAppBarWidget extends StatelessWidget {
+class ListPrescScreenAppBarWidget extends StatelessWidget {
   final VoidCallback onRefresh;
 
-  const ListScreenAppBarWidget({
+  const ListPrescScreenAppBarWidget({
     super.key,
     required this.onRefresh,
   });
