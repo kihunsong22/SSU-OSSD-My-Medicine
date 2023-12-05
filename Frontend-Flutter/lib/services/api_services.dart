@@ -20,6 +20,26 @@ class ApiService {
     return response.statusCode;
   }
 
+  Future<int> login(String loginId, String password) async {
+    final url = Uri.http(baseUrl, '/login', {
+      'loginId': loginId,
+      'password': password,
+    });
+    final response = await http.get(url);
+    log("/login: REQ: $url");
+    log("/login: <${response.statusCode}>, <${response.body}>");
+    if (response.statusCode != 200) {
+      log('Server Response : ${response.statusCode}');
+
+      return -1;
+    } else {
+      Map<String, dynamic> uidData = jsonDecode(response.body);
+      int uidValue = uidData["uid"];
+
+      return uidValue;
+    }
+  }
+
   Future<UserModel> getUserInfo(int uid) async {
     final url = Uri.http(baseUrl, '/getUserInfo', {'uid': '$uid'});
     log(url.toString());

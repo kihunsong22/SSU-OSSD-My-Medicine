@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:medicineapp/screens/home_screen.dart';
 import 'package:medicineapp/screens/login_screen.dart';
 
 void main() {
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const LoginScreen(),
+      home: LoginScreen(),
+      // home: const TempWidget(),
     );
   }
 }
@@ -30,5 +32,14 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..userAgent =
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36';
+  }
+}
+
+class TempWidget extends StatelessWidget {
+  const TempWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

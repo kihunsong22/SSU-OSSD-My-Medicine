@@ -1,12 +1,25 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:medicineapp/screens/home_screen.dart';
 import 'package:medicineapp/screens/list_presc_screen.dart';
+import 'package:medicineapp/services/api_services.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final ApiService apiService = ApiService();
+  final TextEditingController usernameController = TextEditingController(
+    text: "kihun22",
+  );
+  final TextEditingController passwordController = TextEditingController(
+    text: "12345678",
+  );
+
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // int uid = 2000;
+
     return Scaffold(
         backgroundColor: Colors.white,
         // backgroundColor: Colors.grey[100],
@@ -26,7 +39,10 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(
                       height: 30,
                     ),
-                    TextFieldSet(),
+                    TextFieldSet(
+                      usernameController: usernameController,
+                      passwordController: passwordController,
+                    ),
                     // const SizedBox(
                     //   height: 5,
                     // ),
@@ -58,13 +74,8 @@ class LoginScreen extends StatelessWidget {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              // builder: (context) => const ListPrescScreen(),
-                              builder: (context) => HomeScreen(),
-                            ),
-                          );
+                          // validateAndSubmit(context, uid);
+                          validateAndSubmit(context);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurple[300],
@@ -141,22 +152,43 @@ class LoginScreen extends StatelessWidget {
           ),
         ));
   }
+
+  void validateAndSubmit(BuildContext context) async {
+    String username = usernameController.text;
+    String password = passwordController.text;
+
+    int uid = await apiService.login(username, password);
+
+    log("uid: $uid");
+
+    if (uid > 0) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            uid: uid,
+          ),
+        ),
+      );
+    }
+  }
 }
 
 class TextFieldSet extends StatelessWidget {
-  TextFieldSet({
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+
+  const TextFieldSet({
     super.key,
+    required this.usernameController,
+    required this.passwordController,
   });
 
   // text editing controllers
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    usernameController.text = 'kihun22';
-    passwordController.text = '1234';
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
@@ -167,7 +199,7 @@ class TextFieldSet extends StatelessWidget {
           LoginTextField(
             controller: usernameController,
             hintText: '아이디',
-            initialValue: 'kihun22',
+            // initialValue: 'kihun22',
             obscureText: false,
           ),
           Container(
@@ -181,7 +213,7 @@ class TextFieldSet extends StatelessWidget {
           LoginTextField(
             controller: passwordController,
             hintText: '비밀번호',
-            initialValue: '12341234',
+            // initialValue: '12341234',
             obscureText: true,
           ),
         ],
@@ -193,7 +225,7 @@ class TextFieldSet extends StatelessWidget {
 class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
-  final String initialValue;
+  // final String initialValue;
   final bool obscureText;
 
   const LoginTextField({
@@ -201,15 +233,16 @@ class LoginTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     required this.obscureText,
-    required this.initialValue,
+    // required this.initialValue,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       obscureText: obscureText,
       //
-      initialValue: initialValue,
+      // initialValue: initialValue,
       //
       style: const TextStyle(
         fontSize: 15,

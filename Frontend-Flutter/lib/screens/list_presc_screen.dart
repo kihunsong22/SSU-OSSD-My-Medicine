@@ -8,7 +8,12 @@ import 'package:medicineapp/services/api_services.dart';
 import 'package:medicineapp/widgets/prescription_widget.dart';
 
 class ListPrescScreen extends StatefulWidget {
-  const ListPrescScreen({super.key});
+  final int uid;
+
+  const ListPrescScreen({
+    super.key,
+    required this.uid,
+  });
 
   @override
   State<ListPrescScreen> createState() => _ListPrescScreenState();
@@ -16,7 +21,7 @@ class ListPrescScreen extends StatefulWidget {
 
 class _ListPrescScreenState extends State<ListPrescScreen> {
   // final username, password;
-  static const uid = 2000;
+  // static const uid = 2000;
 
   final ApiService apiService = ApiService();
 
@@ -35,6 +40,8 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
         }),
         centerTitle: true,
         backgroundColor: Colors.deepPurple[200],
+        elevation: 5,
+        shadowColor: Colors.grey[300],
       ),
       body: Column(
         children: [
@@ -46,7 +53,7 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
             child: FutureBuilder<List<dynamic>>(
               future: Future.wait([
                 apiService.pingServer(),
-                apiService.getPrescList(uid),
+                apiService.getPrescList(widget.uid),
               ]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -74,7 +81,7 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
                               bottom: 20,
                             ),
                             child: PrescWidget(
-                              uid: uid,
+                              uid: widget.uid,
                               prescId: snapshot.data![1].prescIdList[
                                   snapshot.data![1].length - index - 1],
                             ),

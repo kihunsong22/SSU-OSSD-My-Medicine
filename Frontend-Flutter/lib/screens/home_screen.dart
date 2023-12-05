@@ -3,7 +3,13 @@ import 'package:medicineapp/screens/list_presc_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  final int uid;
+
+  HomeScreen({
+    super.key,
+    // super.key,
+    required this.uid,
+  });
 
   // PersistentTabController _controller;
 
@@ -15,7 +21,7 @@ class HomeScreen extends StatelessWidget {
     return PersistentTabView(
       context,
       controller: _controller,
-      screens: _buildScreens(),
+      screens: _buildScreens(uid),
       items: _navBarsItems(),
       confineInSafeArea: true,
       backgroundColor: Colors.white,
@@ -46,11 +52,17 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-List<Widget> _buildScreens() {
+List<Widget> _buildScreens(int uid) {
   return [
-    const ListPrescScreen(),
-    const ListPrescScreen(),
-    const ListPrescScreen(),
+    ListPrescScreen(
+      uid: uid,
+    ), // Home
+    ListPrescScreen(
+      uid: uid,
+    ), // Add
+    ListPrescScreen(
+      uid: uid,
+    ), // Search
   ];
 }
 
@@ -65,9 +77,10 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
     PersistentBottomNavBarItem(
       icon: const Icon(Icons.add),
       title: ("Add"),
-      // activeColorPrimary: Colors.deepPurple[200]!,
-      activeColorPrimary: Colors.white,
+      activeColorPrimary: Colors.deepPurple[200]!,
+      activeColorSecondary: Colors.white,
       inactiveColorPrimary: Colors.grey,
+      inactiveColorSecondary: Colors.grey,
     ),
     PersistentBottomNavBarItem(
       icon: const Icon(Icons.search),

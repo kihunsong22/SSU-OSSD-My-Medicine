@@ -24,8 +24,14 @@ class PrescModel {
 
   bool get isExpired {
     final now = DateTime.now();
-    final regDate =
-        DateTime.parse(this.regDate); // todo: "2023-12.4" -> "2023-12-04"
+
+    final year = this.regDate.substring(0, this.regDate.indexOf('-'));
+    final month = this.regDate.substring(
+        this.regDate.indexOf('-') + 1, this.regDate.lastIndexOf('-'));
+    final day = this.regDate.substring(this.regDate.lastIndexOf('-') + 1);
+
+    final regDate = DateTime(int.parse(year), int.parse(month), int.parse(day));
+
     final diff = now.difference(regDate).inDays;
     return diff > prescPeriodDays;
   }
