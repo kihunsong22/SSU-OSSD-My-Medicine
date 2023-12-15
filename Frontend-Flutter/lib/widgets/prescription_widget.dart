@@ -135,8 +135,8 @@ class _BuildPrescWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('처방전번호: ${prescModel.prescId.toString()}'),
-                  Text(prescModel.regDate),
+                  Text('처방전번호: ${prescModel.prescId.toString()}', style: TextStyle( fontWeight: FontWeight.bold)),
+                  Text(prescModel.regDate, style: TextStyle( fontWeight: FontWeight.bold)),
                 ],
               ),
               const Divider(),

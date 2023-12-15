@@ -110,7 +110,7 @@ class PrescDetailScreen extends StatelessWidget {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.005),
                 Container(
                   padding:
-                      const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                      const EdgeInsets.only(bottom: 20, left: 10, right: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -209,6 +209,7 @@ class PrescDetailScreen extends StatelessWidget {
                                         " 주의 ",
                                         style: TextStyle(
                                           fontSize: 26,
+                                          fontWeight: FontWeight.bold,
                                           color: Color(0xffe66452),
                                         ),
                                       ),
