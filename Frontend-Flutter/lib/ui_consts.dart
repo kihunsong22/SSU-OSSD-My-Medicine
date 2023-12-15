@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 
 // extension HexColor on Color {
 //   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
@@ -19,3 +20,15 @@ import 'dart:ui';
 
 const mainColor1 = Color(0x009fa3ff);
 const warnColor1 = Color(0x00ff9f9f);
+
+class MyApp extends StatelessWidget{
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(fontFamily: 'NotoSansKR'),
+      themeMode: ThemeMode.system,
+    );
+  }
+}

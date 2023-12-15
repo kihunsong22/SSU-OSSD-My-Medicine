@@ -3,12 +3,16 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:medicineapp/models/prescription_model.dart';
+// import 'package:medicineapp/widgets/bottom_modal_sheet.dart';
 
 class PrescDetailScreen extends StatelessWidget {
+  // final int uid, prescId;
   final PrescModel prescModel;
 
   PrescDetailScreen({
     super.key,
+    // required this.uid,
+    // required this.prescId,
     required this.prescModel,
   });
 
@@ -18,7 +22,7 @@ class PrescDetailScreen extends StatelessWidget {
     '위점막보호제',
     // '알러지 치료제',
     // '비스테로이드성소염제'
-  ];
+  ]; // Add your list of strings here
 
   String _getPrescPicLink(int prescId) {
     String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
@@ -161,12 +165,68 @@ class PrescDetailScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                        // minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         backgroundColor: const Color(0xfffda2a0)),
                     onPressed: () {
-                      DisplayPopup(context);
+                      log("Button pop");
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (BuildContext context) {
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.5,
+                            margin: const EdgeInsets.only(
+                              left: 25,
+                              right: 25,
+                              bottom: 40,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.03,
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.07),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  // const SizedBox(
+                                  //   height: 20,
+                                  // ),
+                                  const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.warning_amber_rounded,
+                                          color: Color(0xffe66452), size: 26),
+                                      Text(
+                                        " 주의 ",
+                                        style: TextStyle(
+                                          fontSize: 26,
+                                          color: Color(0xffe66452),
+                                        ),
+                                      ),
+                                      Icon(Icons.warning_amber_rounded,
+                                          color: Color(0xffe66452), size: 26),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Text(prescModel.generatedInstruction),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     },
                     child: const Text(
                       '주의사항 보기',
@@ -186,59 +246,6 @@ class PrescDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void DisplayPopup(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.5,
-          margin: const EdgeInsets.only(
-            left: 25,
-            right: 25,
-            bottom: 40,
-          ),
-          padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.03,
-              horizontal: MediaQuery.of(context).size.width * 0.07),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(12),
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.warning_amber_rounded,
-                        color: Color(0xffe66452), size: 26),
-                    Text(
-                      " 주의 ",
-                      style: TextStyle(
-                        fontSize: 26,
-                        color: Color(0xffe66452),
-                      ),
-                    ),
-                    Icon(Icons.warning_amber_rounded,
-                        color: Color(0xffe66452), size: 26),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(prescModel.generatedInstruction),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

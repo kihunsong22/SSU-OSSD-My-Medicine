@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        fontFamily: "NotoSansKR"
       ),
       home: LoginScreen(),
       // home: const TempWidget(),
