@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:medicineapp/screens/login_screen.dart';
 import 'package:medicineapp/screens/presc_list_screen.dart';
+import 'package:medicineapp/screens/presc_upload_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,8 +18,18 @@ class HomeScreen extends StatelessWidget {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
 
-  void setIndex(int index) {
+  void setIndex(int index, BuildContext context) {
     _controller.index = index;
+    PersistentNavBarNavigator.pushNewScreen(context, screen: LoginScreen());
+  }
+
+  void pushExitScreen(BuildContext context) {
+    PersistentNavBarNavigator.pushNewScreen(context, screen: LoginScreen());
+  }
+
+  void pushUploadScreen(BuildContext context) {
+    // PersistentNavBarNavigator.pushNewScreen(context,
+    //     screen: DisplayPrescUploadScreen(uid: uid, func: pushExitScreen));
   }
 
   @override
@@ -25,7 +37,11 @@ class HomeScreen extends StatelessWidget {
     return PersistentTabView(
       context,
       controller: _controller,
-      screens: _buildScreens(uid, setIndex),
+      screens: _buildScreens(
+        uid,
+        () => pushExitScreen(context),
+        () => pushUploadScreen(context),
+      ),
       items: _navBarsItems(),
       confineInSafeArea: true,
       backgroundColor: Colors.white,
@@ -56,19 +72,20 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-List<Widget> _buildScreens(int uid, Function(int i) setIndex) {
+List<Widget> _buildScreens(
+    int uid, Function pushExitScreen, Function pushUploadScreen) {
   return [
     PrescListScreen(
       uid: uid,
-      setIndex: setIndex,
+      func: pushExitScreen,
     ), // Home
-    PrescListScreen(
+    PrescUploadScreen(
       uid: uid,
-      setIndex: setIndex,
+      func: pushUploadScreen,
     ), // Add
     PrescListScreen(
       uid: uid,
-      setIndex: setIndex,
+      func: pushExitScreen,
     ), // Search
   ];
 }

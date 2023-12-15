@@ -4,28 +4,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:medicineapp/models/prescription_model.dart';
 
-class PrescDetailScreen extends StatelessWidget {
-  final PrescModel prescModel;
+class PrescUploadScreen extends StatelessWidget {
+  final int uid;
+  Function func;
 
-  PrescDetailScreen({
+  PrescUploadScreen({
     super.key,
-    required this.prescModel,
+    required this.uid,
+    required this.func,
   });
-
-  final List<String> randomTexts = [
-    '이지민바보',
-    '세균감염증 치료제',
-    '위점막보호제',
-    // '알러지 치료제',
-    // '비스테로이드성소염제'
-  ];
-
-  String _getPrescPicLink(int prescId) {
-    String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
-    log("getPrescPicLink: $url");
-
-    return url;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +62,8 @@ class PrescDetailScreen extends StatelessWidget {
                         Icon(Icons.calendar_today_outlined,
                             color: Colors.grey[700], size: 22),
                         const SizedBox(width: 5, height: 1),
-                        Text(prescModel.regDate,
-                            style: const TextStyle(
+                        const Text("prescModel.regDate",
+                            style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w500)),
                       ],
                     ),
@@ -92,18 +79,18 @@ class PrescDetailScreen extends StatelessWidget {
                     )
                   ],
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                const Divider(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                Text('처방전번호: ${prescModel.prescId.toString()}',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500)),
-                Text('처방기간: ${prescModel.prescPeriodDays.toString()}일',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500)),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                const Divider(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                // const Divider(),
+                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                // Text('처방전번호: ${prescModel.prescId.toString()}',
+                //     style: const TextStyle(
+                //         fontSize: 16, fontWeight: FontWeight.w500)),
+                // Text('처방기간: ${prescModel.prescPeriodDays.toString()}일',
+                //     style: const TextStyle(
+                //         fontSize: 16, fontWeight: FontWeight.w500)),
+                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                // const Divider(),
+                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
                 Container(
                   padding:
                       const EdgeInsets.only(bottom: 20, left: 20, right: 20),
@@ -112,20 +99,6 @@ class PrescDetailScreen extends StatelessWidget {
                     children: [
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.005),
-                      for (var i = 0; i < prescModel.medicineListLength; i++)
-                        Row(
-                          children: [
-                            Text(
-                              prescModel.medicineList[i],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                                "  |  ${randomTexts[math.Random().nextInt(randomTexts.length)]}"),
-                          ],
-                        ),
                     ],
                   ),
                 ),
@@ -135,18 +108,7 @@ class PrescDetailScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: Container(
-                    foregroundDecoration: BoxDecoration(
-                      color: prescModel.isExpired
-                          ? Colors.grey[300]
-                          : Colors.white,
-                      backgroundBlendMode: BlendMode.darken,
-                    ),
-                    child: Image.network(
-                      _getPrescPicLink(prescModel.prescIdValue),
-                      height: MediaQuery.of(context).size.height * 0.35,
-                    ),
-                  ),
+                  child: const Placeholder(),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
@@ -161,15 +123,16 @@ class PrescDetailScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                        // minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        backgroundColor: const Color(0xfffda2a0)),
+                        backgroundColor: const Color(0xff9fa3ff)),
                     onPressed: () {
                       DisplayPopup(context);
                     },
                     child: const Text(
-                      '주의사항 보기',
+                      '저장',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
@@ -210,10 +173,10 @@ class PrescDetailScreen extends StatelessWidget {
               Radius.circular(12),
             ),
           ),
-          child: SingleChildScrollView(
+          child: const SingleChildScrollView(
             child: Column(
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.warning_amber_rounded,
@@ -231,7 +194,7 @@ class PrescDetailScreen extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    Text(prescModel.generatedInstruction),
+                    Text("prescModel.generatedInstruction"),
                   ],
                 )
               ],
