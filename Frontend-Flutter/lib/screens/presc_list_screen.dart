@@ -3,41 +3,41 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:medicineapp/models/prescription_list_model.dart';
 import 'package:medicineapp/models/user_model.dart';
-import 'package:medicineapp/screens/ui_consts.dart';
+import 'package:medicineapp/screens/login_screen.dart';
+import 'package:medicineapp/ui_consts.dart';
 import 'package:medicineapp/services/api_services.dart';
 import 'package:medicineapp/widgets/prescription_widget.dart';
 
-class ListPrescScreen extends StatefulWidget {
+class PrescListScreen extends StatefulWidget {
   final int uid;
+  void Function(int i) setIndex;
 
-  const ListPrescScreen({
+  PrescListScreen({
     super.key,
     required this.uid,
+    required this.setIndex,
   });
 
   @override
-  State<ListPrescScreen> createState() => _ListPrescScreenState();
+  State<PrescListScreen> createState() => _PrescListScreenState();
 }
 
-class _ListPrescScreenState extends State<ListPrescScreen> {
-  // final username, password;
-  // static const uid = 2000;
-
+class _PrescListScreenState extends State<PrescListScreen> {
   final ApiService apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
-    // late Future<int> serverStatus = apiService.pingServer();
-    // late Future<UserModel> userData = apiService.getUserInfo(uid);
-    // late Future<PrescListModel> prescList = apiService.getPrescList(uid);
-
     return Scaffold(
-      // backgroundColor: Colors.grey[100],
       backgroundColor: const Color(0xfff2f2fe),
       appBar: AppBar(
-        title: ListPrescScreenAppBarWidget(onRefresh: () {
-          setState(() {});
-        }),
+        title: PrescListScreenAppBarWidget(
+          onRefresh: () {
+            setState(() {});
+          },
+          setIndex: (int i) {
+            widget.setIndex(i);
+          },
+        ),
         centerTitle: true,
         backgroundColor: Colors.deepPurple[200],
         elevation: 5,
@@ -45,10 +45,6 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 20,
-            width: 1,
-          ),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: Future.wait([
@@ -74,17 +70,11 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
                       return ListView.builder(
                         itemCount: snapshot.data![1].length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            padding: const EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                              bottom: 20,
-                            ),
-                            child: PrescWidget(
-                              uid: widget.uid,
-                              prescId: snapshot.data![1].prescIdList[
-                                  snapshot.data![1].length - index - 1],
-                            ),
+                          return PrescWidget(
+                            index: index,
+                            uid: widget.uid,
+                            prescId: snapshot.data![1].prescIdList[
+                                snapshot.data![1].length - index - 1],
                           );
                         },
                       );
@@ -104,21 +94,38 @@ class _ListPrescScreenState extends State<ListPrescScreen> {
   }
 }
 
-class ListPrescScreenAppBarWidget extends StatelessWidget {
+class PrescListScreenAppBarWidget extends StatelessWidget {
   final VoidCallback onRefresh;
+  final Function(int i) setIndex;
 
-  const ListPrescScreenAppBarWidget({
+  const PrescListScreenAppBarWidget({
     super.key,
     required this.onRefresh,
+    required this.setIndex,
   });
+
+  void handleLogout(BuildContext context) {
+    // Call your logout function here, for example:
+    // await AuthService().logout();
+
+    // Reset the tab controller
+    // tabController.index = 0;
+    setIndex(0);
+
+    // Clear the navigation stack and navigate to the LoginScreen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      // (Route<dynamic> route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(
         // vertical: 40,
-        left: 20,
-        right: 5,
+        left: 12,
+        right: 0,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,11 +141,16 @@ class ListPrescScreenAppBarWidget extends StatelessWidget {
                     onRefresh();
                   },
                   icon:
-                      const Icon(Icons.refresh, color: Colors.white, size: 35)),
-              const SizedBox(width: 5),
-              const Icon(Icons.notifications, color: Colors.white, size: 35),
-              const SizedBox(width: 5),
-              const Icon(Icons.person, color: Colors.white, size: 35),
+                      const Icon(Icons.refresh, color: Colors.white, size: 32)),
+              // const SizedBox(width: 5),
+              const Icon(Icons.notifications, color: Colors.white, size: 32),
+              // const SizedBox(width: 5),
+              IconButton(
+                  onPressed: () {
+                    handleLogout(context);
+                  },
+                  icon:
+                      const Icon(Icons.logout, color: Colors.white, size: 32)),
             ],
           ),
         ],

@@ -6,21 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:medicineapp/models/prescription_list_model.dart';
 import 'package:medicineapp/models/prescription_model.dart';
 import 'package:medicineapp/models/user_model.dart';
+import 'package:medicineapp/screens/presc_detail_screen.dart';
 import 'package:medicineapp/services/api_services.dart';
 
 // ignore: must_be_immutable
 class PrescWidget extends StatelessWidget {
-  final int uid, prescId;
+  final int index, uid, prescId;
 
-  PrescWidget({super.key, required this.prescId, required this.uid});
+  PrescWidget({
+    super.key,
+    required this.index,
+    required this.prescId,
+    required this.uid,
+  });
 
   final ApiService apiService = ApiService();
-
   late Future<PrescModel> prescInfo = apiService.getPrescInfo(prescId);
-  // late Future<Uint8List> getPrescPic = apiService.getPrescPic(prescId);
-  // late Future<String> prescPicLink = apiService.getPrescPicLink(prescId);
-  // late Future<String> getPrescPic = apiService.getPrescPic(prescId);
-  // late Future<String> prescPic
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +35,6 @@ class PrescWidget extends StatelessWidget {
     return FutureBuilder(
       future: Future.wait([
         prescInfo,
-        // prescPicLink,
-        // getPrescPic,
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -49,13 +48,34 @@ class PrescWidget extends StatelessWidget {
         } else {
           final prescModel = snapshot.data?[0] as PrescModel;
           prescModel.printPrescInfoOneline();
-          return _BuildPrescWidget(
-            prescId: prescId,
-            context: context,
-            prescModel: prescModel,
-            // prescPic: snapshot.data![1] as Uint8List,
-          );
-          // return _BuildPrescWidget(context, snapshot.data);
+          if (index == 0) {
+            return Container(
+              padding: const EdgeInsets.only(
+                top: 20,
+                left: 20,
+                right: 20,
+                bottom: 20,
+              ),
+              child: _BuildPrescWidget(
+                prescId: prescId,
+                context: context,
+                prescModel: prescModel,
+              ),
+            );
+          } else {
+            return Container(
+              padding: const EdgeInsets.only(
+                left: 20,
+                right: 20,
+                bottom: 20,
+              ),
+              child: _BuildPrescWidget(
+                prescId: prescId,
+                context: context,
+                prescModel: prescModel,
+              ),
+            );
+          }
         }
       },
     );
@@ -66,14 +86,11 @@ class _BuildPrescWidget extends StatelessWidget {
   final int prescId;
   final BuildContext context;
   final PrescModel prescModel;
-  // final Uint8List prescPic;
-  // final String prescPicLink;
 
   const _BuildPrescWidget({
     // super.key,
     required this.context,
     required this.prescModel,
-    // required this.prescPic,
     required this.prescId,
   });
 
@@ -87,63 +104,78 @@ class _BuildPrescWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log("is_expired: ${prescModel.isExpired}");
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      decoration: (BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            // offset: Offset(0, 2),
-            blurRadius: 6,
+    return GestureDetector(
+      onTap: () {
+        // Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PrescDetailScreen(
+              prescModel: prescModel,
+            ),
           ),
-        ],
-        color: prescModel.isExpired ? Colors.grey[350] : Colors.white,
-      )),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('처방전번호: ${prescModel.prescId.toString()}'),
-              Text(prescModel.regDate),
+        );
+      },
+      child: Hero(
+        tag: prescId,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          decoration: (BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+              ),
             ],
-          ),
-          const Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            color: prescModel.isExpired ? Colors.grey[350] : Colors.white,
+          )),
+          child: Column(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  for (var i = 0; i < prescModel.medicineListLength; i++)
-                    Text(
-                      prescModel.medicineList[i],
-                    ),
+                  Text('처방전번호: ${prescModel.prescId.toString()}'),
+                  Text(prescModel.regDate),
                 ],
               ),
-              Container(
-                  width: 100,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for (var i = 0; i < prescModel.medicineListLength; i++)
+                        Text(
+                          prescModel.medicineList[i],
+                        ),
+                    ],
                   ),
-                  child: Container(
-                    foregroundDecoration: BoxDecoration(
-                      color: prescModel.isExpired
-                          ? Colors.grey[400]
-                          : Colors.white,
-                      backgroundBlendMode: BlendMode.darken,
-                    ),
-                    child: Image.network(
-                      _getPrescPicLink(prescId),
-                    ),
-                  )),
+                  Container(
+                      width: 100,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Container(
+                        foregroundDecoration: BoxDecoration(
+                          color: prescModel.isExpired
+                              ? Colors.grey[400]
+                              : Colors.white,
+                          backgroundBlendMode: BlendMode.darken,
+                        ),
+                        child: Image.network(
+                          _getPrescPicLink(prescId),
+                        ),
+                      )),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

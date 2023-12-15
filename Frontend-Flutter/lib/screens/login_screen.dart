@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:medicineapp/screens/home_screen.dart';
-import 'package:medicineapp/screens/list_presc_screen.dart';
+import 'package:medicineapp/screens/presc_list_screen.dart';
 import 'package:medicineapp/services/api_services.dart';
 
 class LoginScreen extends StatelessWidget {

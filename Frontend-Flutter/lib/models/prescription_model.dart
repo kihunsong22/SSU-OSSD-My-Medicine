@@ -6,12 +6,14 @@ class PrescModel {
   final String regDate;
   final int prescPeriodDays;
   final List<String> medicineList;
+  final String generatedInstruction;
 
   PrescModel({
     required this.prescId,
     required this.regDate,
     required this.prescPeriodDays,
     required this.medicineList,
+    required this.generatedInstruction,
   });
 
   String get regDateString {
@@ -37,12 +39,14 @@ class PrescModel {
   }
 
   int get medicineListLength => medicineList.length;
+  int get prescIdValue => prescId;
 
   PrescModel.fromJson(Map<String, dynamic> json)
       : prescId = json['prescId'],
         regDate = json['regDate'],
         prescPeriodDays = json['duration'],
-        medicineList = json['medicine'].toString().split(',').reversed.toList();
+        medicineList = json['medicine'].toString().split(',').reversed.toList(),
+        generatedInstruction = json['generatedInstruction'];
 
   void printPrescInfoOneline() {
     log("prescId: $prescId, date: $regDate, prescPeriodDays: $prescPeriodDays, medicineList: $medicineList");
