@@ -10,12 +10,12 @@ import 'package:medicineapp/widgets/prescription_widget.dart';
 
 class PrescListScreen extends StatefulWidget {
   final int uid;
-  void Function(int i) setIndex;
+  Function func;
 
   PrescListScreen({
     super.key,
     required this.uid,
-    required this.setIndex,
+    required this.func,
   });
 
   @override
@@ -34,9 +34,7 @@ class _PrescListScreenState extends State<PrescListScreen> {
           onRefresh: () {
             setState(() {});
           },
-          setIndex: (int i) {
-            widget.setIndex(i);
-          },
+          func: widget.func,
         ),
         centerTitle: true,
         backgroundColor: Colors.deepPurple[200],
@@ -96,12 +94,12 @@ class _PrescListScreenState extends State<PrescListScreen> {
 
 class PrescListScreenAppBarWidget extends StatelessWidget {
   final VoidCallback onRefresh;
-  final Function(int i) setIndex;
+  final Function func;
 
   const PrescListScreenAppBarWidget({
     super.key,
     required this.onRefresh,
-    required this.setIndex,
+    required this.func,
   });
 
   void handleLogout(BuildContext context) {
@@ -110,7 +108,7 @@ class PrescListScreenAppBarWidget extends StatelessWidget {
 
     // Reset the tab controller
     // tabController.index = 0;
-    setIndex(0);
+    func();
 
     // Clear the navigation stack and navigate to the LoginScreen
     Navigator.of(context).pushReplacement(
