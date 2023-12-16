@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medicineapp/models/prescription_model.dart';
 import 'package:medicineapp/services/api_services.dart';
+import 'package:medicineapp/widgets/toast.dart';
 
 class PrescUploadScreen extends StatefulWidget {
   final int uid;
@@ -66,7 +67,7 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
         medicineList += _controllers[i].text;
       }
     }
-    log("medicineList: $medicineList");
+    log("/presc_upload_screen: medicineList: $medicineList");
     return medicineList;
   }
 
@@ -80,56 +81,33 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
   }
 
   void validateAndSubmit(BuildContext context) async {
+    String medicineList = _fetchMedicineList();
     if (_prescDaysController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "복용일수를 입력해주세요",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showToast("복용일수를 입력해주세요");
       return;
     }
 
-    if (_fetchMedicineList().isEmpty) {
-      Fluttertoast.showToast(
-        msg: "약을 입력해주세요",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        // backgroundColor: Colors.red,
-        // textColor: Colors.white,
-        fontSize: 16.0,
-      );
+    if (medicineList.isEmpty) {
+      showToast("약을 입력해주세요");
       return;
     } else {
-      log("length: ${_controllers.length}");
+      // log("/presc_upload_screen: validateAndSubmit(): length: ${_controllers.length}");
     }
 
     if (_image == null) {
-      Fluttertoast.showToast(
-        msg: "처방전 사진을 추가해주세요",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        // backgroundColor: Colors.red,
-        // textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      showToast("처방전 사진을 추가해주세요");
       return;
     }
     int duration = int.parse(_prescDaysController.text);
 
-    _uploadPresc(widget.uid, duration, _fetchMedicineList(), _image!);
+    _uploadPresc(widget.uid, duration, medicineList, _image!);
   }
 
   void _uploadPresc(int uid, int duration, String medList, XFile img) async {
     final imgBytes = await img.readAsBytes();
     int prescId =
         await widget.apiService.uploadImage(uid, duration, medList, imgBytes);
-    log("prescId: $prescId");
+    log("/presc_upload_screen: _uploadPresc(): prescId: $prescId");
   }
 
   @override
@@ -146,7 +124,7 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
             children: [
               IconButton(
                 onPressed: () => {
-                  log("뒤로가기를 시도했으나 실패함ㅋ")
+                  log("/presc_upload_screen: 뒤로가기를 시도했으나 실패함ㅋ")
                   // Navigator.of(context).pop(),
                 },
                 icon: Icon(Icons.arrow_back_ios, color: Colors.grey[600]),

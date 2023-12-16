@@ -8,7 +8,9 @@ import 'package:medicineapp/services/api_services.dart';
 class LoginScreen extends StatelessWidget {
   final ApiService apiService = ApiService();
   final TextEditingController usernameController = TextEditingController(
-    text: "kihun22",
+    // text: "kihun22",
+    text: "testman",
+    // text: "legatalee",
   );
   final TextEditingController passwordController = TextEditingController(
     text: "12345678",

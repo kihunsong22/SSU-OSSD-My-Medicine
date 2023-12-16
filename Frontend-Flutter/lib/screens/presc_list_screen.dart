@@ -65,17 +65,26 @@ class _PrescListScreenState extends State<PrescListScreen> {
                         child: Text('Server status error'),
                       );
                     } else {
-                      return ListView.builder(
-                        itemCount: snapshot.data![1].length,
-                        itemBuilder: (context, index) {
-                          return PrescWidget(
-                            index: index,
-                            uid: widget.uid,
-                            prescId: snapshot.data![1].prescIdList[
-                                snapshot.data![1].length - index - 1],
-                          );
-                        },
-                      );
+                      log("presc_list_screen: ${snapshot.data![1].toString()}");
+                      log("presc_list_screen: ${snapshot.data![1].prescIdList.toString()}");
+                      if (snapshot.data![1] == null ||
+                          snapshot.data![1].prescIdList[0] == null) {
+                        return const Center(
+                          child: Text('No data'),
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data![1].length,
+                          itemBuilder: (context, index) {
+                            return PrescWidget(
+                              index: index,
+                              uid: widget.uid,
+                              prescId: snapshot.data![1].prescIdList[
+                                  snapshot.data![1].length - index - 1],
+                            );
+                          },
+                        );
+                      }
                     }
                   } else {
                     return const Center(

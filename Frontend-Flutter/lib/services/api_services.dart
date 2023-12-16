@@ -7,6 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:medicineapp/models/prescription_list_model.dart';
 import 'package:medicineapp/models/prescription_model.dart';
 import 'package:medicineapp/models/user_model.dart';
+import 'package:medicineapp/widgets/toast.dart';
 
 class ApiService {
   static const String baseUrl = '141.164.62.81:5000';
@@ -121,18 +122,26 @@ class ApiService {
     var response = await request.send();
 
     if (response.statusCode == 200) {
+      showToast("처방전이 등록되었습니다.");
+
       final respStr = await response.stream.bytesToString();
+      log("api_services: /newPresc: response: <${response.statusCode}>, $respStr");
       final resData = jsonDecode(respStr);
       log(resData.toString());
 
-      final uploadedPrescId = int.parse(resData["res"]);
-      log("uploadedPrescId: $uploadedPrescId");
+      // final a = resData["res"];
+      // final uploadedPrescId = int.parse(a);
+      // log("api_services: /newPresc: uploadedPrescId: $uploadedPrescId");
+      // log("api_services: /newPresc: res: ${resData['0']}");
 
-      // final prescData = PrescModel.fromJson(resData);
-      // return prescData.prescId;
+      // return uploadedPrescId;
+      // return 1;
+
+      return response.statusCode;
     }
 
-    log("uploadImage Error: ${response.statusCode}");
+    showToast("처방전이 등록 에러");
+    log("/api_services: uploadImage(): Error: ${response.statusCode}");
     throw Error();
   }
 
