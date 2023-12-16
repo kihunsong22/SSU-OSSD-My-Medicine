@@ -4,8 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:medicineapp/screens/home_screen.dart';
 import 'package:medicineapp/screens/login_screen.dart';
 
+class MyImageCache extends ImageCache {
+  @override
+  void clear() {
+    // print('Clearing cache!');
+    super.clear();
+  }
+}
+
+class MyWidgetsBinding extends WidgetsFlutterBinding {
+  @override
+  ImageCache createImageCache() => MyImageCache();
+}
+
 void main() {
   HttpOverrides.global = MyHttpOverrides();
+  MyWidgetsBinding();
+
   runApp(const MyApp());
 }
 
@@ -17,10 +32,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Medicine App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        fontFamily: "NotoSansKR"
-      ),
+      theme:
+          ThemeData(primarySwatch: Colors.deepPurple, fontFamily: "NotoSansKR"),
       home: LoginScreen(),
       // home: const TempWidget(),
     );

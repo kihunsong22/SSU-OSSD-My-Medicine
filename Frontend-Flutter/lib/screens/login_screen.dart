@@ -45,15 +45,16 @@ class LoginScreen extends StatelessWidget {
                       usernameController: usernameController,
                       passwordController: passwordController,
                     ),
-                    // const SizedBox(
-                    //   height: 5,
-                    // ),
+                    const SizedBox(
+                      height: 4,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         IconButton(
                             padding: const EdgeInsets.all(0),
-                            iconSize: 18,
+                            visualDensity: VisualDensity.compact,
+                            iconSize: 20,
                             onPressed: () {},
                             icon: Icon(
                               Icons.check_circle,
@@ -67,6 +68,9 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(
+                      height: 4,
                     ),
                     // const SizedBox(
                     //   height: 5,
@@ -165,7 +169,7 @@ class LoginScreen extends StatelessWidget {
 
     if (uid > 0) {
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(

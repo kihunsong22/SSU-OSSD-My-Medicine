@@ -17,12 +17,17 @@ class PrescDetailScreen extends StatelessWidget {
   });
 
   final List<String> randomTexts = [
-    '이지민바보',
+    '항히스타민제',
+    '세균감염증치료제',
+    '위점막보호제',
+    '알러지 치료제',
+    '소염진통제',
+    '알러지 치료제',
+    '위산억제제',
     '세균감염증 치료제',
     '위점막보호제',
-    // '알러지 치료제',
-    // '비스테로이드성소염제'
-  ]; // Add your list of strings here
+    '비스테로이드성소염제'
+  ];
 
   String _getPrescPicLink(int prescId) {
     String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
@@ -55,11 +60,16 @@ class PrescDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: Colors.grey[100],
+        // backgroundColor: Colors.grey[100],
+        backgroundColor: Colors.white,
         elevation: 5,
         shadowColor: Colors.grey[300],
       ),
       body: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          // borderRadius: BorderRadius.circular(18),
+        ),
         padding: const EdgeInsets.only(
           top: 25,
           left: 25,
@@ -110,7 +120,7 @@ class PrescDetailScreen extends StatelessWidget {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.005),
                 Container(
                   padding:
-                      const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                      const EdgeInsets.only(bottom: 5, left: 10, right: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -127,7 +137,8 @@ class PrescDetailScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                                "  |  ${randomTexts[math.Random().nextInt(randomTexts.length)]}"),
+                                // "  |  ${randomTexts[math.Random().nextInt(randomTexts.length)]}"),
+                                "  |  ${randomTexts[i]}"),
                           ],
                         ),
                     ],
@@ -197,9 +208,6 @@ class PrescDetailScreen extends StatelessWidget {
                             child: SingleChildScrollView(
                               child: Column(
                                 children: [
-                                  // const SizedBox(
-                                  //   height: 20,
-                                  // ),
                                   const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [

@@ -12,6 +12,7 @@ import 'package:medicineapp/services/api_services.dart';
 // ignore: must_be_immutable
 class PrescWidget extends StatelessWidget {
   final int index, uid, prescId;
+  // final String desc;
 
   PrescWidget({
     super.key,

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medicineapp/models/prescription_model.dart';
+import 'package:medicineapp/screens/login_screen.dart';
 import 'package:medicineapp/screens/presc_list_screen.dart';
 import 'package:medicineapp/services/api_services.dart';
 import 'package:medicineapp/widgets/toast.dart';
@@ -15,12 +16,12 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class PrescUploadScreen extends StatefulWidget {
   final int uid;
-  // Function func;
+  Function func;
 
   PrescUploadScreen({
     super.key,
     required this.uid,
-    // required this.func,
+    required this.func,
   });
 
   final ApiService apiService = ApiService();
@@ -109,9 +110,17 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
 
     if (uploadResult == 200) {
       showToast("처방전이 등록되었습니다.");
-      // widget.func();
-      PersistentNavBarNavigator.pushNewScreen(context,
-          screen: PrescListScreen(uid: widget.uid));
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(builder: (context) => PrescListScreen(uid: this.uid, func: this.func)),
+      //   // (Route<dynamic> route) => false,
+      // );
+
+      widget.func(context);
+
+      // PersistentNavBarNavigator.pushNewScreen(
+      //   context,
+      //   screen: PrescListScreen(uid: widget.uid, func: widget.func),
+      // );
     } else {
       showToast("처방전 등록 에러");
     }
@@ -141,17 +150,21 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
             children: [
               IconButton(
                 onPressed: () => {
-                  log("/presc_upload_screen: 뒤로가기를 시도했으나 실패함ㅋ")
-                  // Navigator.of(context).pop(),
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: PrescListScreen(uid: widget.uid, func: widget.func),
+                  )
                 },
-                icon: Icon(Icons.arrow_back_ios, color: Colors.grey[600]),
+                // icon: Icon(Icons.arrow_back_ios, color: Colors.grey[600]),
+                icon: Icon(Icons.arrow_back_sharp, color: Colors.grey[600]),
               ),
               const Text('처방전 업로드'),
               const SizedBox(width: 30, height: 1), // for centering text
             ],
           ),
         ),
-        backgroundColor: Colors.grey[100],
+        // backgroundColor: Colors.grey[100],
+        backgroundColor: Colors.white,
         elevation: 5,
         shadowColor: Colors.grey[300],
       ),
@@ -223,7 +236,7 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
                   width: 1,
                 ),
                 Container(
@@ -237,6 +250,7 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
                     color: Colors.white,
                   ),
                   child: Column(
+                    // crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
                         child: ListView.builder(
@@ -335,7 +349,8 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        backgroundColor: const Color(0xff9fa3ff)),
+                        // backgroundColor: const Color(0xff9fa3ff)),
+                        backgroundColor: Colors.deepPurple[300]),
                     onPressed: () {
                       validateAndSubmit(context);
                     },
@@ -426,9 +441,18 @@ class MedInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: EdgeInsets.only(
+        left: MediaQuery.of(context).size.width * 0.04,
+        // right: MediaQuery.of(context).size.width * 0.05,
+      ),
+      visualDensity: VisualDensity.compact,
+      minVerticalPadding: 5,
+      horizontalTitleGap: 0,
+      minLeadingWidth: 0,
       leading: Container(
         width: 40,
         height: 40,
+        margin: const EdgeInsets.only(right: 25),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Colors.grey[200],
@@ -447,7 +471,7 @@ class MedInfoTile extends StatelessWidget {
       title: Row(
         children: [
           Container(
-            width: 200,
+            width: 220,
             height: 30,
             alignment: Alignment.bottomCenter,
             decoration: BoxDecoration(
@@ -469,18 +493,21 @@ class MedInfoTile extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(
+            width: 3,
+          ),
+          IconButton(
+            onPressed: () => {
+              onRemove(idx),
+            },
+            icon: Icon(
+              Icons.delete_outline,
+              color: Colors.grey[600],
+            ),
+          ),
         ],
       ),
-      trailing: IconButton(
-        onPressed: () => {
-          // controller.removeTile(idx),
-          onRemove(idx),
-        },
-        icon: Icon(
-          Icons.delete_outline,
-          color: Colors.grey[600],
-        ),
-      ),
+      // trailing:
     );
   }
 }
