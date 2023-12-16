@@ -96,7 +96,9 @@ class _BuildPrescWidget extends StatelessWidget {
   });
 
   String _getPrescPicLink(int prescId) {
-    String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
+    // String url = "http://141.164.62.81:5000/getPrescPic?prescId=$prescId";
+    String url =
+        "http://141.164.62.81:5000/getPrescPic?prescId=$prescId&v=${DateTime.now().millisecondsSinceEpoch}";
     log("getPrescPicLink: $url");
 
     return url;
@@ -164,16 +166,17 @@ class _BuildPrescWidget extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Container(
-                        foregroundDecoration: BoxDecoration(
-                          color: prescModel.isExpired
-                              ? Colors.grey[400]
-                              : Colors.white,
-                          backgroundBlendMode: BlendMode.darken,
-                        ),
-                        child: Image.network(
-                          _getPrescPicLink(prescId),
-                        ),
-                      )),
+                          foregroundDecoration: BoxDecoration(
+                            color: prescModel.isExpired
+                                ? Colors.grey[400]
+                                : Colors.white,
+                            backgroundBlendMode: BlendMode.darken,
+                          ),
+                          child: Image(
+                            image: NetworkImage(
+                              _getPrescPicLink(prescId),
+                            ),
+                          ))),
                 ],
               ),
             ],

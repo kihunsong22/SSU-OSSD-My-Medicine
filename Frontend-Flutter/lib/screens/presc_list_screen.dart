@@ -25,6 +25,20 @@ class PrescListScreen extends StatefulWidget {
 
 class _PrescListScreenState extends State<PrescListScreen> {
   final ApiService apiService = ApiService();
+  late Future<List<dynamic>> futureData;
+
+  @override
+  void initState() {
+    super.initState();
+    futureData = fetchData();
+  }
+
+  Future<List<dynamic>> fetchData() {
+    return Future.wait([
+      apiService.pingServer(),
+      apiService.getPrescList(widget.uid),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +62,15 @@ class _PrescListScreenState extends State<PrescListScreen> {
                 children: [
                   IconButton(
                       onPressed: () {
-                        setState(() {});
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (BuildContext context) => super.widget,
+                        //   ),
+                        // );
+                        setState(() {
+                          futureData = fetchData();
+                        });
                       },
                       icon: const Icon(Icons.refresh,
                           color: Colors.white, size: 32)),
@@ -59,25 +81,6 @@ class _PrescListScreenState extends State<PrescListScreen> {
                   IconButton(
                       onPressed: () {
                         Restart.restartApp();
-                        // widget.func(context);
-                        // Navigator.pop(context);
-                        // Navigator.pop(context);
-
-                        // Navigator.of(context).pushAndRemoveUntil(
-                        //     MaterialPageRoute(
-                        //         builder: (context) => LoginScreen()),
-                        //     (Route<dynamic> route) => false);
-
-                        // Navigator.(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => LoginScreen()),
-                        // );
-                        // Navigator.of(context).push(
-                        //   MaterialPageRoute(
-                        //       builder: (context) => LoginScreen()),
-                        //   // (Route<dynamic> route) => false,
-                        // );
                       },
                       icon: const Icon(Icons.logout,
                           color: Colors.white, size: 32)),
@@ -95,10 +98,7 @@ class _PrescListScreenState extends State<PrescListScreen> {
         children: [
           Expanded(
             child: FutureBuilder<List<dynamic>>(
-              future: Future.wait([
-                apiService.pingServer(),
-                apiService.getPrescList(widget.uid),
-              ]),
+              future: futureData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -150,35 +150,3 @@ class _PrescListScreenState extends State<PrescListScreen> {
     );
   }
 }
-
-// class PrescListScreenAppBarWidget extends StatelessWidget {
-//   final VoidCallback onRefresh;
-//   final Function func;
-
-//   const PrescListScreenAppBarWidget({
-//     super.key,
-//     required this.onRefresh,
-//     required this.func,
-//   });
-
-//   void handleLogout(BuildContext context) {
-//     // Call your logout function here, for example:
-//     // await AuthService().logout();
-
-//     // Reset the tab controller
-//     // tabController.index = 0;
-//     // func();
-
-//     // Clear the navigation stack and navigate to the LoginScreen
-//     // Navigator.of(context).popUntil((route) => route.isFirst);
-//     Navigator.of(context).pushReplacement(
-//       MaterialPageRoute(builder: (context) => LoginScreen()),
-//       // (Route<dynamic> route) => false,
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return 
-//   }
-// }
