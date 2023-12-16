@@ -20,11 +20,17 @@ class HomeScreen extends StatelessWidget {
 
   void setIndex(int index, BuildContext context) {
     _controller.index = index;
-    PersistentNavBarNavigator.pushNewScreen(context, screen: LoginScreen());
+    PersistentNavBarNavigator.pushNewScreen(context,
+        screen: HomeScreen(
+          uid: uid,
+        ));
   }
 
   void pushExitScreen(BuildContext context) {
-    PersistentNavBarNavigator.pushNewScreen(context, screen: LoginScreen());
+    PersistentNavBarNavigator.pushNewScreen(context,
+        screen: HomeScreen(
+          uid: uid,
+        ));
   }
 
   void pushUploadScreen(BuildContext context) {
@@ -39,8 +45,8 @@ class HomeScreen extends StatelessWidget {
       controller: _controller,
       screens: _buildScreens(
         uid,
-        () => pushExitScreen(context),
-        () => pushUploadScreen(context),
+        // () => pushExitScreen(context),
+        // () => pushUploadScreen(context),
       ),
       items: _navBarsItems(),
       confineInSafeArea: true,
@@ -72,20 +78,21 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-List<Widget> _buildScreens(
-    int uid, Function pushExitScreen, Function pushUploadScreen) {
+List<Widget> _buildScreens(int uid
+    // Function pushExitScreen, Function pushUploadScreen
+    ) {
   return [
     PrescListScreen(
       uid: uid,
-      func: pushExitScreen,
+      // func: pushExitScreen,
     ), // Home
     PrescUploadScreen(
       uid: uid,
-      func: pushUploadScreen,
+      // func: pushUploadScreen,
     ), // Add
     PrescListScreen(
       uid: uid,
-      func: pushExitScreen,
+      // func: pushExitScreen,
     ), // Search
   ];
 }

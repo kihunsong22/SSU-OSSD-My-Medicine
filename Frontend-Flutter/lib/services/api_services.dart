@@ -98,6 +98,7 @@ class ApiService {
       return resData;
     }
     log("getPrescPic Error: ${response.statusCode}");
+    return Uint8List(0);
     throw Error();
   }
 

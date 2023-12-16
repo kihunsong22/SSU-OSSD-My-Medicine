@@ -121,7 +121,7 @@ class _BuildPrescWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           decoration: (BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
@@ -160,7 +160,7 @@ class _BuildPrescWidget extends StatelessWidget {
                       width: 100,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Container(
                         foregroundDecoration: BoxDecoration(

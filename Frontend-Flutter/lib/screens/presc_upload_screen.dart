@@ -8,17 +8,19 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medicineapp/models/prescription_model.dart';
+import 'package:medicineapp/screens/presc_list_screen.dart';
 import 'package:medicineapp/services/api_services.dart';
 import 'package:medicineapp/widgets/toast.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class PrescUploadScreen extends StatefulWidget {
   final int uid;
-  Function func;
+  // Function func;
 
   PrescUploadScreen({
     super.key,
     required this.uid,
-    required this.func,
+    // required this.func,
   });
 
   final ApiService apiService = ApiService();
@@ -100,14 +102,29 @@ class _PrescUploadScreenState extends State<PrescUploadScreen> {
     }
     int duration = int.parse(_prescDaysController.text);
 
-    _uploadPresc(widget.uid, duration, medicineList, _image!);
+    final uploadResult =
+        await _uploadPresc(widget.uid, duration, medicineList, _image!);
+
+    log("/presc_upload_screen: validateAndSubmit(): uploadResult: $uploadResult");
+
+    if (uploadResult == 200) {
+      showToast("처방전이 등록되었습니다.");
+      // widget.func();
+      PersistentNavBarNavigator.pushNewScreen(context,
+          screen: PrescListScreen(uid: widget.uid));
+    } else {
+      showToast("처방전 등록 에러");
+    }
   }
 
-  void _uploadPresc(int uid, int duration, String medList, XFile img) async {
+  Future<int> _uploadPresc(
+      int uid, int duration, String medList, XFile img) async {
     final imgBytes = await img.readAsBytes();
-    int prescId =
+    int uploadResult =
         await widget.apiService.uploadImage(uid, duration, medList, imgBytes);
-    log("/presc_upload_screen: _uploadPresc(): prescId: $prescId");
+    log("/presc_upload_screen: _uploadPresc(): uploadResult: $uploadResult");
+
+    return uploadResult;
   }
 
   @override
