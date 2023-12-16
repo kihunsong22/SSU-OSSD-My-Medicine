@@ -2,6 +2,7 @@ const express = require('express')
 const http = require('http')
 const multer = require('multer');
 const path = require("path");
+const { exec } = require('child_process');
 const app = express()
 const server = http.createServer(app)
 const PORT = 5000
@@ -87,8 +88,14 @@ app.get('/getPrescList', (req, res) => { //end
 
 app.get('/getPrescPic', (req, res) => { //end
     const {prescId} = req.query;
-    var fs = require('fs');
-    const file = fs.readFileSync(`../image/${prescId}.jpg`)
+    var fs = require('fs'); 
+    var file;
+    try {
+        file = fs.readFileSync(`../image/${prescId}.jpg`)
+    }
+    catch (err) {
+        file = fs.readFileSync(`../image/0000.jpg`)
+    }
     res.writeHead(200, {"Content-Type":"image/jpg"})
     res.write(file)
     res.end()
@@ -214,7 +221,7 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         if(prescIdList!="") { 
             let prescIdListLength = prescIdList.split(',').length; 
             var arr = prescIdList.split(',');
-            let last = arr[prescIdListLength-1].charAt(3);
+            let last = arr[prescIdListLength-1].slice(-3);
             console.log(`last prescId : ${last}`);
             count = parseInt(last);
         }
@@ -259,6 +266,13 @@ app.post('/newPresc', upload.single('image'), async (req, res) => {
         var fs = require('fs');
         fs.rename(req.file.path, path.join("/mymedicine/image", newFileName), async (err) => {
         });
+        exec(`python3 cv.py ${prescId}`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`이미지 처리 오류 발생`);
+            }
+            console.log(`이미지 처리 완료`);
+          });
+          
         async function main() {
             const completion = await openai.chat.completions.create({
               messages: [{"role": "system", "content": "너는 약 복용 주의사항을 알려주는 비서야. 약 리스트를 넘겨주면, 해당 약별로 복용 주의사항을 응답해줘. 앞에 '알겠습니다.'는 붙이지 마. 형식은 약명:\n-주의사항 1\n-주의사항2.. 이렇게 해줘."},
