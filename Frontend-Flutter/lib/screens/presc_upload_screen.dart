@@ -1,10 +1,16 @@
 import 'dart:developer';
-import 'dart:math' as math;
+import 'dart:io';
+// import 'dart:math' as math;
+// import 'package:http/http.dart' as http;
+// import 'package:http_parser/http_parser.dart';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:medicineapp/models/prescription_model.dart';
+import 'package:medicineapp/services/api_services.dart';
 
-class PrescUploadScreen extends StatelessWidget {
+class PrescUploadScreen extends StatefulWidget {
   final int uid;
   Function func;
 
@@ -13,6 +19,118 @@ class PrescUploadScreen extends StatelessWidget {
     required this.uid,
     required this.func,
   });
+
+  final ApiService apiService = ApiService();
+
+  @override
+  State<PrescUploadScreen> createState() => _PrescUploadScreenState();
+}
+
+class _PrescUploadScreenState extends State<PrescUploadScreen> {
+  final List<TextEditingController> _controllers = [];
+  final _prescDaysController = TextEditingController();
+
+  XFile? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < 3; i++) {
+      _controllers.add(TextEditingController());
+    }
+  }
+
+  void _addTile() {
+    setState(() {
+      _controllers.add(TextEditingController());
+    });
+  }
+
+  void _removeTile(int index) {
+    setState(() {
+      // _controllers.removeLast();
+      _controllers.removeAt(index - 1);
+    });
+  }
+
+  String _fetchMedicineList() {
+    String medicineList = "";
+    for (int i = 0; i < _controllers.length; i++) {
+      if (_controllers[i].text.isEmpty) {
+        continue;
+      } else {
+        if (i > 0) {
+          medicineList += ", ";
+        }
+        medicineList += _controllers[i].text;
+      }
+    }
+    log("medicineList: $medicineList");
+    return medicineList;
+  }
+
+  void _pickImage() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    setState(() {
+      _image = pickedFile;
+    });
+  }
+
+  void validateAndSubmit(BuildContext context) async {
+    if (_prescDaysController.text.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "복용일수를 입력해주세요",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
+
+    if (_fetchMedicineList().isEmpty) {
+      Fluttertoast.showToast(
+        msg: "약을 입력해주세요",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    } else {
+      log("length: ${_controllers.length}");
+    }
+
+    if (_image == null) {
+      Fluttertoast.showToast(
+        msg: "처방전 사진을 추가해주세요",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
+    int duration = int.parse(_prescDaysController.text);
+
+    _uploadPresc(widget.uid, duration, _fetchMedicineList(), _image!);
+  }
+
+  void _uploadPresc(int uid, int duration, String medList, XFile img) async {
+    final imgBytes = await img.readAsBytes();
+    int prescId =
+        await widget.apiService.uploadImage(uid, duration, medList, imgBytes);
+    log("prescId: $prescId");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +144,15 @@ class PrescUploadScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(width: 10, height: 1), // for centering text
-              const Text('처방전 상세정보'),
-              Row(
-                children: [
-                  Icon(Icons.edit, color: Colors.grey[700], size: 30),
-                  const SizedBox(width: 3, height: 1),
-                  Icon(Icons.delete_rounded, color: Colors.grey[700], size: 30),
-                ],
-              )
+              IconButton(
+                onPressed: () => {
+                  log("뒤로가기를 시도했으나 실패함ㅋ")
+                  // Navigator.of(context).pop(),
+                },
+                icon: Icon(Icons.arrow_back_ios, color: Colors.grey[600]),
+              ),
+              const Text('처방전 업로드'),
+              const SizedBox(width: 30, height: 1), // for centering text
             ],
           ),
         ),
@@ -43,6 +161,7 @@ class PrescUploadScreen extends StatelessWidget {
         shadowColor: Colors.grey[300],
       ),
       body: Container(
+        color: const Color(0xfff2f2ff),
         padding: const EdgeInsets.only(
           top: 25,
           left: 25,
@@ -52,7 +171,7 @@ class PrescUploadScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,17 +179,46 @@ class PrescUploadScreen extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.calendar_today_outlined,
-                            color: Colors.grey[700], size: 22),
-                        const SizedBox(width: 5, height: 1),
-                        const Text("prescModel.regDate",
+                            color: Colors.grey[900], size: 25),
+                        const SizedBox(width: 10, height: 1),
+                        const Text("복용일수: ",
                             style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w500)),
+                                fontSize: 14, fontWeight: FontWeight.w500)),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.bottomCenter,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: TextField(
+                            controller: _prescDaysController,
+                            textAlign: TextAlign.center,
+                            textAlignVertical: TextAlignVertical.bottom,
+                            maxLines: 1,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              hintText: '7',
+                              hintStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[400],
+                              ),
+                              contentPadding: const EdgeInsets.only(bottom: 4),
+                            ),
+                          ),
+                        ),
+                        const Text("일",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500)),
                       ],
                     ),
                     Row(
                       children: [
                         Icon(Icons.place_outlined,
-                            color: Colors.grey[700], size: 25),
+                            color: Colors.grey[900], size: 25),
                         const SizedBox(width: 3, height: 1),
                         const Text("하나로병원",
                             style: TextStyle(
@@ -79,40 +227,106 @@ class PrescUploadScreen extends StatelessWidget {
                     )
                   ],
                 ),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                // const Divider(),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                // Text('처방전번호: ${prescModel.prescId.toString()}',
-                //     style: const TextStyle(
-                //         fontSize: 16, fontWeight: FontWeight.w500)),
-                // Text('처방기간: ${prescModel.prescPeriodDays.toString()}일',
-                //     style: const TextStyle(
-                //         fontSize: 16, fontWeight: FontWeight.w500)),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                // const Divider(),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                const SizedBox(
+                  height: 40,
+                  width: 1,
+                ),
                 Container(
-                  padding:
-                      const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.01,
+                    bottom: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.005),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _controllers.length,
+                          itemBuilder: (context, index) {
+                            return MedInfoTile(
+                              idx: index + 1,
+                              controller: _controllers[index],
+                              onRemove: _removeTile,
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: _addTile,
+                            child: Row(
+                              children: [
+                                Icon(Icons.add_circle_outline,
+                                    color: Colors.grey[600], size: 30),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "약 추가",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Placeholder(),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
+                const SizedBox(
+                  height: 20,
                   width: 1,
+                ),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.22,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (_image != null)
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                File(_image!.path),
+                                // height: 150,
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add_a_photo_outlined,
+                                    color: Colors.grey[600], size: 30),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "처방전 사진 추가",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -123,13 +337,12 @@ class PrescUploadScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        // minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         backgroundColor: const Color(0xff9fa3ff)),
                     onPressed: () {
-                      DisplayPopup(context);
+                      validateAndSubmit(context);
                     },
                     child: const Text(
                       '저장',
@@ -137,13 +350,10 @@ class PrescUploadScreen extends StatelessWidget {
                         fontSize: 18,
                         color: Colors.white,
                       ),
-                    ), // Change this to your desired button text
+                    ),
                   ),
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.06,
-                  width: 1,
-                ),
+                const SizedBox(height: 45),
               ],
             ),
           ],
@@ -202,6 +412,80 @@ class PrescUploadScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class MedInfoTile extends StatelessWidget {
+  final int idx;
+  final TextEditingController controller;
+  Function onRemove;
+
+  MedInfoTile({
+    super.key,
+    required this.idx,
+    required this.controller,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey[200],
+        ),
+        child: Center(
+          child: Text(
+            "$idx",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
+          ),
+        ),
+      ),
+      title: Row(
+        children: [
+          Container(
+            width: 200,
+            height: 30,
+            alignment: Alignment.bottomCenter,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: TextField(
+              controller: controller,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.bottom,
+              maxLines: 1,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: '아스피린',
+                hintStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[400],
+                ),
+                contentPadding: const EdgeInsets.only(bottom: 4),
+              ),
+            ),
+          ),
+        ],
+      ),
+      trailing: IconButton(
+        onPressed: () => {
+          // controller.removeTile(idx),
+          onRemove(idx),
+        },
+        icon: Icon(
+          Icons.delete_outline,
+          color: Colors.grey[600],
+        ),
+      ),
     );
   }
 }

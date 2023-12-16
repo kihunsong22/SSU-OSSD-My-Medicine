@@ -37,7 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^1.1.0
   persistent_bottom_nav_bar: any
-  modal_bottom_sheet: ^2.1.2
+  image_picker: ^0.8.4+4
+  http_parser: ^4.0.0
+  fluttertoast: ^8.2.4
+  # modal_bottom_sheet: ^2.1.2
 
 dev_dependencies:
   flutter_test:
@@ -78,11 +81,11 @@ flutter:
        # - asset: assets/fonts/NotoSansKR-Regular.ttf
        # - asset: assets/fonts/NotoSansKR-SemiBold.ttf
        # - asset: assets/fonts/NotoSansKR-Thin.ttf
-    - family: IBMPlexSansKR
-      fonts:
-        - asset: assets/fonts/IBMPlexSansKR-Medium.ttf
-        - asset: assets/fonts/IBMPlexSansKR-Bold.ttf
-        - asset: assets/fonts/IBMPlexSansKR-Light.ttf
+    # - family: IBMPlexSansKR
+    #   fonts:
+    #     - asset: assets/fonts/IBMPlexSansKR-Medium.ttf
+    #     - asset: assets/fonts/IBMPlexSansKR-Bold.ttf
+    #     - asset: assets/fonts/IBMPlexSansKR-Light.ttf
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

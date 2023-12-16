@@ -3,6 +3,7 @@ import 'dart:developer';
 // import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:medicineapp/models/prescription_list_model.dart';
 import 'package:medicineapp/models/prescription_model.dart';
 import 'package:medicineapp/models/user_model.dart';
@@ -96,6 +97,42 @@ class ApiService {
       return resData;
     }
     log("getPrescPic Error: ${response.statusCode}");
+    throw Error();
+  }
+
+// upload image
+  Future<int> uploadImage(
+      int uid, int duration, String medList, Uint8List image) async {
+    final url = Uri.parse('http://141.164.62.81:5000/newPresc');
+
+    var request = http.MultipartRequest('POST', url);
+
+    request.fields['uid'] = uid.toString();
+    request.fields['duration'] = duration.toString();
+    request.fields['medList'] = medList;
+
+    request.files.add(http.MultipartFile.fromBytes(
+      'image',
+      image,
+      filename: 'upload.jpg',
+      contentType: MediaType('image', 'jpeg'),
+    ));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final respStr = await response.stream.bytesToString();
+      final resData = jsonDecode(respStr);
+      log(resData.toString());
+
+      final uploadedPrescId = int.parse(resData["res"]);
+      log("uploadedPrescId: $uploadedPrescId");
+
+      // final prescData = PrescModel.fromJson(resData);
+      // return prescData.prescId;
+    }
+
+    log("uploadImage Error: ${response.statusCode}");
     throw Error();
   }
 
